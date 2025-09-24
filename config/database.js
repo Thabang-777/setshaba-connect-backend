@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
@@ -21,7 +21,7 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 // Create client for user operations (with row level security)
 export const supabaseAuth = createClient(
   supabaseUrl, 
-  process.env.VITE_SUPABASE_ANON_KEY,
+  process.env.SUPABASE_ANON_KEY,
   {
     auth: {
       autoRefreshToken: false,
