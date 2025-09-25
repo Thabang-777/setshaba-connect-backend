@@ -2,6 +2,7 @@ import express from 'express';
 import { supabaseAuth, supabase } from '../config/database.js';
 import { validateRequest, registerSchema, loginSchema } from '../middleware/validation.js';
 import { getMunicipalityFromCoordinates, formatError, formatSuccess } from '../utils/helpers.js';
+import Joi from 'joi';
 
 const router = express.Router();
 
