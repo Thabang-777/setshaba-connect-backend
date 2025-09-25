@@ -44,6 +44,22 @@ const options = {
             created_at: { type: 'string', format: 'date-time' }
           }
         },
+        ForgotPasswordRequest: {
+          type: 'object',
+          required: ['email'],
+          properties: {
+            email: { type: 'string', format: 'email', description: 'Email address to send reset link to' }
+          }
+        },
+        ResetPasswordRequest: {
+          type: 'object',
+          required: ['access_token', 'refresh_token', 'new_password'],
+          properties: {
+            access_token: { type: 'string', description: 'Access token from reset link' },
+            refresh_token: { type: 'string', description: 'Refresh token from reset link' },
+            new_password: { type: 'string', minLength: 6, description: 'New password (minimum 6 characters)' }
+          }
+        },
         Report: {
           type: 'object',
           properties: {

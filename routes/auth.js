@@ -112,4 +112,81 @@ router.post('/login', validateRequest(loginSchema), async (req, res) => {
   }
 });
 
+// Forgot password endpoint
+router.post('/forgot-password', validateRequest(Joi.object({
+  email: Joi.string().email().required()
+})), async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists in our database
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, email')
+      .eq('email', email)
+      .single();
+
+    // Always return success for security (don't reveal if email exists)
+    // But only send reset email if user actually exists
+    if (userData && !userError) {
+      // Send password reset email using Supabase Auth
+      const { error: resetError } = await supabaseAuth.auth.resetPasswordForEmail(email, {
+        redirectTo: process.env.NODE_ENV === 'production' 
+          ? 'https://your-app-domain.com/reset-password'
+          : 'http://localhost:3000/reset-password'
+      });
+
+      if (resetError) {
+        console.error('Password reset error:', resetError);
+        // Still return success to not reveal if email exists
+      }
+    }
+
+    res.json(formatSuccess(
+      null, 
+      'If an account with this email exists, you will receive a password reset link shortly.'
+    ));
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json(formatError('Internal server error'));
+  }
+});
+
+// Reset password endpoint
+router.post('/reset-password', validateRequest(Joi.object({
+  access_token: Joi.string().required(),
+  refresh_token: Joi.string().required(),
+  new_password: Joi.string().min(6).required()
+})), async (req, res) => {
+  try {
+    const { access_token, refresh_token, new_password } = req.body;
+
+    // Set the session with the tokens from the reset link
+    const { data: sessionData, error: sessionError } = await supabaseAuth.auth.setSession({
+      access_token,
+      refresh_token
+    });
+
+    if (sessionError || !sessionData.user) {
+      return res.status(400).json(formatError('Invalid or expired reset link'));
+    }
+
+    // Update the user's password
+    const { error: updateError } = await supabaseAuth.auth.updateUser({
+      password: new_password
+    });
+
+    if (updateError) {
+      return res.status(400).json(formatError('Failed to update password'));
+    }
+
+    res.json(formatSuccess(null, 'Password updated successfully'));
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json(formatError('Internal server error'));
+  }
+});
+
 export default router;

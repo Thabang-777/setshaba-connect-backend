@@ -96,4 +96,45 @@ describe('Authentication Endpoints', () => {
       expect(response.body.error).toBe('Validation error');
     });
   });
+
+  describe('POST /api/auth/forgot-password', () => {
+    it('should handle forgot password request successfully', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testUser.email })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toContain('password reset link');
+    });
+
+    it('should handle forgot password for non-existent email', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'nonexistent@example.com' })
+        .expect(200);
+
+      // Should still return success for security
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toContain('password reset link');
+    });
+
+    it('should return validation error for invalid email', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'invalid-email' })
+        .expect(400);
+
+      expect(response.body.error).toBe('Validation error');
+    });
+
+    it('should return validation error for missing email', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({})
+        .expect(400);
+
+      expect(response.body.error).toBe('Validation error');
+    });
+  });
 });

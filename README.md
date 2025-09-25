@@ -33,6 +33,8 @@ A comprehensive backend API for the Setshaba Connect hackathon project, enabling
 ### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - User login
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password` - Reset password with tokens
 
 ### Users
 - `GET /api/users/me` - Get current user profile
