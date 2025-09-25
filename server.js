@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import reportRoutes from './routes/reports.js';
 import municipalityRoutes from './routes/municipalities.js';
+import wardRoutes from './routes/wards.js';
 import statusUpdateRoutes from './routes/status-updates.js';
 
 // Load environment variables
@@ -96,6 +97,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/municipalities', municipalityRoutes);
+app.use('/api/wards', wardRoutes);
 app.use('/api/reports', statusUpdateRoutes);
 
 // 404 handler

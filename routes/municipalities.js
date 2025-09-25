@@ -1,5 +1,6 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
+import { authenticateToken, requireOfficial } from '../middleware/auth.js';
 import { formatError, formatSuccess } from '../utils/helpers.js';
 
 const router = express.Router();
@@ -143,6 +144,38 @@ router.get('/:id/reports', async (req, res) => {
 
   } catch (error) {
     console.error('Get municipality reports error:', error);
+    res.status(500).json(formatError('Internal server error'));
+  }
+});
+
+// Bulk import municipalities (officials only)
+router.post('/import', authenticateToken, requireOfficial, async (req, res) => {
+  try {
+    const { municipalities } = req.body;
+    
+    if (!municipalities || !Array.isArray(municipalities)) {
+      return res.status(400).json(formatError('Municipalities array is required'));
+    }
+
+    const { data, error } = await supabase
+      .from('municipalities')
+      .upsert(municipalities, { 
+        onConflict: 'name',
+        ignoreDuplicates: false 
+      })
+      .select();
+
+    if (error) {
+      return res.status(400).json(formatError('Failed to import municipalities'));
+    }
+
+    res.json(formatSuccess({ 
+      municipalities: data,
+      imported_count: data.length 
+    }, `Successfully imported ${data.length} municipalities`));
+
+  } catch (error) {
+    console.error('Import municipalities error:', error);
     res.status(500).json(formatError('Internal server error'));
   }
 });

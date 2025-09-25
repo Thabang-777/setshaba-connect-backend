@@ -2,7 +2,6 @@ import express from 'express';
 import { supabaseAuth, supabase } from '../config/database.js';
 import { validateRequest, registerSchema, loginSchema } from '../middleware/validation.js';
 import { getMunicipalityFromCoordinates, formatError, formatSuccess } from '../utils/helpers.js';
-import Joi from 'joi';
 
 const router = express.Router();
 
@@ -133,7 +132,7 @@ router.post('/forgot-password', validateRequest(Joi.object({
       // Send password reset email using Supabase Auth
       const { error: resetError } = await supabaseAuth.auth.resetPasswordForEmail(email, {
         redirectTo: process.env.NODE_ENV === 'production' 
-          ? 'https://your-app-domain.com/reset-password'
+          ? 'https://setshaba-connect-backend.onrender.com/reset-password'
           : 'http://localhost:3000/reset-password'
       });
 
