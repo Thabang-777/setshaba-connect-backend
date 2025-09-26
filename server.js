@@ -20,6 +20,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ Trust Render (or any reverse proxy) to get correct client IPs
+app.set('trust proxy', 1);
+
 /**
  * @swagger
  * /health:
@@ -52,7 +55,7 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
+// General rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
@@ -62,7 +65,10 @@ const limiter = rateLimit({
   }
 });
 
-// Apply rate limiting to auth routes only
+// Apply rate limiting globally
+app.use(limiter);
+
+// More strict rate limiting for auth routes
 app.use('/api/auth', rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 auth requests per windowMs
@@ -71,8 +77,6 @@ app.use('/api/auth', rateLimit({
     statusCode: 429
   }
 }));
-
-app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
