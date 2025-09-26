@@ -12,6 +12,7 @@ import reportRoutes from './routes/reports.js';
 import municipalityRoutes from './routes/municipalities.js';
 import wardRoutes from './routes/wards.js';
 import statusUpdateRoutes from './routes/status-updates.js';
+import analyticsRoutes from './routes/analytics.js';
 
 // Load environment variables
 dotenv.config();
@@ -99,6 +100,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/municipalities', municipalityRoutes);
 app.use('/api/wards', wardRoutes);
 app.use('/api/reports', statusUpdateRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
