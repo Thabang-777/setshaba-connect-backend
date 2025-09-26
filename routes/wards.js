@@ -80,8 +80,14 @@ router.post('/import', authenticateToken, requireOfficial, async (req, res) => {
       return res.status(400).json(formatError('GeoJSON URL is required'));
     }
 
-    // Fetch GeoJSON data
-    const response = await fetch(geojson_url);
+    // Fetch GeoJSON data with GitHub token if available
+    const headers = {};
+    console.log(process.env.GITHUB_PAT);
+    if (process.env.GITHUB_PAT) {
+      headers['Authorization'] = `token ${process.env.GITHUB_PAT}`;
+    }
+
+    const response = await fetch(geojson_url, { headers });
     if (!response.ok) {
       return res.status(400).json(formatError('Failed to fetch GeoJSON data'));
     }
@@ -184,9 +190,6 @@ router.get('/boundaries/simplified', async (req, res) => {
     if (municipality_id) {
       query = query.eq('municipality_id', municipality_id);
     }
-    
-    // If bounds provided, we could add spatial filtering here
-    // For now, we'll return all and let the client filter
     
     const { data: wards, error } = await query;
 
